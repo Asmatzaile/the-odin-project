@@ -1,9 +1,9 @@
-# computer randomly selects the secret colors (6)
-#human gets feedback: exactly correct or correct color but wrong space
+# frozen_string_literal: true
 
+# Helper functions for Game class
 module Helpers
   def count_elements(array)
-    array.reduce(Hash.new(0)) do |hash, element, index|
+    array.reduce(Hash.new(0)) do |hash, element|
       hash[element] += 1
       hash
     end
@@ -16,16 +16,16 @@ module Helpers
   end
 end
 
-class Game 
+# Main class
+class Game
   include Helpers
 
-  def initialize 
+  def initialize
     # @code = Array.new(4) {rand(6)}
     @code = [3, 2, 2, 1]
   end
 
   def check(guess)
-
     code_available = count_elements(code)
     is_fully_right = array_elements_equal?(guess, code)
 
@@ -34,22 +34,20 @@ class Game
     end
 
     feedback =
-    guess.map.with_index do |element, index|
-      next 'fully_right' if is_fully_right[index]
-      next false unless code_available[element] > 0
-      code_available[element] -= 1
-      'semi_right'
-    end
+      guess.map.with_index do |element, index|
+        next 'fully_right' if is_fully_right[index]
+        next false unless code_available[element].positive?
+
+        code_available[element] -= 1
+        'semi_right'
+      end
     p feedback
   end
 
   private
+
   attr_reader :code
-
 end
-
-
-
 
 game = Game.new
 game.check([1, 2, 1, 9])
