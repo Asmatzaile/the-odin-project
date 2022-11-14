@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Linked list
 class LinkedList
   attr_reader :head
@@ -45,7 +47,7 @@ class LinkedList
   def size
     init_pointers
     loop do
-      return current_index if current_node.nil?
+      return @current_index if @current_node.nil?
 
       move_to_next_node
     end
@@ -69,6 +71,12 @@ class LinkedList
     at(tail_index - 1).next_node = nil
   end
 
+  def shift
+    return if head.nil?
+
+    @head = head.next_node
+  end
+
   def contains?(value)
     !find(value).nil?
   end
@@ -84,28 +92,34 @@ class LinkedList
   end
 
   def to_s
-    string = ''
+    # this implementation was done to allow immutable strings
+    string_array = []
     init_pointers
     loop do
-      return string << 'nil' if @current_node.nil?
+      break string_array << 'nil' if @current_node.nil?
 
-      string << "( #{@current_node} ) -> "
+      string_array << ['(', @current_node, ')', '->']
       @current_node = @current_node.next_node
     end
+    string_array.join(' ')
   end
 
   def insert_at(value, index)
     return prepend(value) if index.zero?
     return 'Index too high' if index > size
     return append(value) if index == size
-    # queda x hacer...
+
+    new_node = Node.new(value, index)
+    new_node.next_node = at(index)
+    at(index - 1).next_node = new_node
   end
 
   def remove_at(index)
-    return shift(value) if index.zero?
+    return shift if index.zero?
     return 'Index too high' if index > size
-    return pop if index == size
-    # queda x hacer...
+    return pop if index == size - 1
+
+    at(index - 1).next_node = at(index + 1)
   end
 end
 
@@ -125,21 +139,10 @@ class Node
 end
 
 my_list = LinkedList.new
+my_list.append(1)
+my_list.append(2)
+my_list.append(3)
+my_list.append(4)
 puts my_list
-my_list.prepend('hello 1')
-my_list.append('hello 2')
-my_list.append('hello 3')
-puts my_list
-
-p my_list.find('hello 3')
-p my_list.contains?('hello 3')
-p my_list.contains?('hello 4')
-puts my_list
-my_list.pop
-puts my_list
-my_list.pop
-puts my_list
-my_list.pop
-puts my_list
-my_list.pop
+my_list.insert_at('inserted', 5)
 puts my_list
